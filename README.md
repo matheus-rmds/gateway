@@ -11,21 +11,11 @@ externa) toda vez que a mesma viagem é consultada de novo.
 
 ## Arquitetura
 
-```mermaid
-flowchart LR
-    Cliente[Cliente<br/>Swagger / Postman] -->|REST| Gateway[API Principal<br/>Gateway - Proxy + Cache]
-    Gateway -->|REST| TripService[API Secundária<br/>Trip Service]
-    TripService -->|REST| OpenMeteo[(Open-Meteo<br/>Geocoding + Forecast)]
-    TripService --> DB[(SQLite<br/>trips.db)]
+![Arquitetura do TravelPlan](docs/architecture.png)
 
-    classDef implemented fill:#ffd8a8,stroke:#e8590c,color:#212529
-    classDef external fill:#a5d8ff,stroke:#1971c2,color:#212529
+Laranja = módulos desenvolvidos neste trabalho. 
 
-    class Gateway,TripService implemented
-    class OpenMeteo external
-```
-
-Laranja = módulos desenvolvidos neste trabalho. Azul = serviço externo consumido.
+Azul = serviço externo consumido.
 
 Fluxo: Cliente -> Gateway (proxy + cache) -> Trip Service (regra de negócio) -> Open-Meteo,
 com o Trip Service persistindo os planos de viagem em SQLite.
