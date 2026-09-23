@@ -1,8 +1,9 @@
 import os
 import time
-from typing import Dict, Optional, Tuple
 import httpx
-from fastapi import FastAPI, Response
+from datetime import date, timedelta
+from typing import Dict, Optional, Tuple
+from fastapi import FastAPI, Path, Response
 from pydantic import BaseModel
 
 TRIP_SERVICE_URL = os.getenv("TRIP_SERVICE_URL", "http://localhost:8001")
@@ -12,15 +13,38 @@ app = FastAPI(title="TravelPlan - Gateway")
 
 _cache: Dict[str, Tuple[float, int, bytes]] = {}
 
+_example_start = (date.today() + timedelta(days=3)).isoformat()
+_example_end = (date.today() + timedelta(days=5)).isoformat()
+
 class TripPayload(BaseModel):
     city: str
     start_date: str
     end_date: str
 
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "city": "Rio de Janeiro",
+                "start_date": _example_start,
+                "end_date": _example_end,
+            }
+        }
+    }
+
 class TripUpdatePayload(BaseModel):
     city: Optional[str] = None
     start_date: Optional[str] = None
     end_date: Optional[str] = None
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "city": "São Paulo",
+                "start_date": _example_start,
+                "end_date": _example_end,
+            }
+        }
+    }
 
 async def _forward(method: str, path: str, body: Optional[dict] = None, use_cache: bool = False) -> Response:
     key = f"{method}:{path}"
@@ -59,17 +83,17 @@ async def list_trips():
     return await _forward("GET", "/trips", use_cache=True)
 
 @app.get("/trips/{trip_id}")
-async def get_trip(trip_id: int):
+async def get_trip(trip_id: int = Path(..., examples=[1])):
     return await _forward("GET", f"/trips/{trip_id}", use_cache=True)
 
 @app.put("/trips/{trip_id}")
-async def update_trip(trip_id: int, payload: TripUpdatePayload):
+async def update_trip(payload: TripUpdatePayload, trip_id: int = Path(..., examples=[1])):
     resp = await _forward("PUT", f"/trips/{trip_id}", body=payload.dict(exclude_unset=True))
     _invalidate_cache(trip_id)
     return resp
 
 @app.delete("/trips/{trip_id}")
-async def delete_trip(trip_id: int):
+async def delete_trip(trip_id: int = Path(..., examples=[1])):
     resp = await _forward("DELETE", f"/trips/{trip_id}")
     _invalidate_cache(trip_id)
     return resp
