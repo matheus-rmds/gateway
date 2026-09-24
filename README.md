@@ -32,7 +32,7 @@ com o Trip Service persistindo os planos de viagem em SQLite.
 
 Documentação interativa (Swagger) disponível em /docs após subir a aplicação.
 
-Demonstração do cache: chame GET /trips/{id} duas vezes seguidas — a segunda
+Demonstração do cache: chame GET /trips/{id} duas vezes seguidas, a segunda
 resposta aparece nos logs (docker logs gateway) como [CACHE HIT], sem
 repassar a chamada para o trip-service.
 
