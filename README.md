@@ -32,7 +32,7 @@ com o Trip Service persistindo os planos de viagem em SQLite.
 
 Documentação interativa (Swagger) disponível em /docs após subir a aplicação.
 
-Demonstração do cache: chame GET /trips/{id} duas vezes seguidas — a segunda
+Demonstração do cache: chame GET /trips/{id} duas vezes seguidas, a segunda
 resposta aparece nos logs (docker logs gateway) como [CACHE HIT], sem
 repassar a chamada para o trip-service.
 
@@ -68,12 +68,12 @@ Passo 3: Construa e rode o trip-service:
 cd ../trip-service
 docker build -t trip-service .
 docker run -d --network travelplan-net --name trip-service trip-service
-cd ../gateway
 ```
 
 Passo 4: Construa e rode o gateway:
 
 ```
+cd ../gateway
 docker build -t gateway .
 docker run -d --network travelplan-net -p 8000:8000 -e TRIP_SERVICE_URL=http://trip-service:8001 --name gateway gateway
 ```
